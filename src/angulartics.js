@@ -298,12 +298,12 @@ function $analyticsRun($rootScope, $window, $analytics, $injector) {
     }
   }
 
-  function pageTrack(url, $location) {
+  function pageTrack(url, $location, resolvedData) {
     if (!matchesExcludedRoute(url)) {
       url = whitelistQueryString(url);
       url = blacklistQueryString(url);
       url = filterUrlSegments(url);
-      $analytics.pageTrack(url, $location);
+      $analytics.pageTrack(url, $location, resolvedData);
     }
   }
 
@@ -375,9 +375,9 @@ function $analyticsRun($rootScope, $window, $analytics, $injector) {
       if ($injector.has('$state') && !$injector.has('$transitions')) {
         noRoutesOrStates = false;
         $rootScope.$on('$stateChangeSuccess', function (event, current) {
-          $injector.invoke(['$location', function ($location) {
+          $injector.invoke(['$location', '$state', function ($location, $state) {
             var url = $analytics.settings.pageTracking.basePath + $location.url();
-            pageTrack(url, $location);
+            pageTrack(url, $location, $state.$current.locals.globals.resolved_data);
           }]);
         });
       }
